@@ -1,5 +1,6 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const webpack = require('webpack');
 
 module.exports = {
     mode: "development",
@@ -11,12 +12,11 @@ module.exports = {
                 test: path.resolve(__dirname, "src/calculator.js"),
                 use: [
                     // Export the Desmos global var
-                    "exports-loader?window.Desmos",
-                    // Set module.exports=undefined to work around Webpack chomping 'define'
-                    // https://github.com/webpack/webpack/issues/386
-                    // Set this=>window to fake closure context as window
-                    // Make jQuery available "globally" for both Desmos & MathQuill
-                    "imports-loader?undefined=>module.exports=undefined,this=>window,jQuery=jquery,window.jQuery=jquery"
+                    "exports-loader?Desmos",
+                    // Set module.exports=undefined and exports=undefined because Desmos has
+                    // dependencies that use UMD preludes that get confused when they are present.
+                    // Set the Desmos variable to an empty object, which will be used as the module export
+                    "imports-loader?undefined=>module.exports=undefined,exports=>undefined,Desmos=>{}"
                 ]
             }
         ]
